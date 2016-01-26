@@ -6,7 +6,7 @@
 #
 # - Redistributions of source code must retain the above copyright notice,
 #   this list of conditions and the following disclaimer.
-# 
+#
 # - Redistributions in binary form must reproduce the above copyright notice,
 #   this list of conditions and the following disclaimer in the documentation
 #   and/or other materials provided with the distribution.
@@ -40,8 +40,9 @@ GPU_LOCK_NO_LOCK = -1
 
 try:
     import magic
-    ms = magic.open(magic.MAGIC_NONE)
-    ms.load()
+    #ms = magic.open(magic.MAGIC_NONE)
+    #ms.load()
+    ms = magic.Magic(mime=False)
 except ImportError: # no magic module
     ms = None
 
@@ -65,20 +66,20 @@ def pickle(filename, data, compress=False):
         fo = open(filename, "wb")
         cPickle.dump(data, fo, protocol=cPickle.HIGHEST_PROTOCOL)
     fo.close()
-    
+
 def unpickle(filename):
     if not os.path.exists(filename):
         raise UnpickleError("Path '%s' does not exist." % filename)
-    if ms is not None and ms.file(filename).startswith('gzip'):
+    if ms is not None and ms.from_file(filename).startswith('gzip'):
         fo = gzip.open(filename, 'rb')
         dict = cPickle.load(fo)
-    elif ms is not None and ms.file(filename).startswith('Zip'):
+    elif ms is not None and ms.from_file(filename).startswith('Zip'):
         fo = zipfile.ZipFile(filename, 'r', zipfile.ZIP_DEFLATED)
         dict = cPickle.loads(fo.read('data'))
     else:
         fo = open(filename, 'rb')
         dict = cPickle.load(fo)
-    
+
     fo.close()
     return dict
 

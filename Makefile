@@ -1,11 +1,13 @@
 MODELNAME := _ConvNet
 
 INCLUDES :=  -I$(PYTHON_INCLUDE_PATH) -I$(NUMPY_INCLUDE_PATH) -I$(CUDA_SDK_PATH) -I./include -I./include/common -I./include/cudaconv2 -I./include/nvmatrix
-LIB := -lpthread -L$(ATLAS_LIB_PATH) -L$(CUDA_INSTALL_PATH)/lib64 -lcblas
+#LIB := -lpthread -L$(ATLAS_LIB_PATH) -L$(CUDA_INSTALL_PATH)/lib64 -lcblas
+LIB := -lpthread -L$(CUDA_INSTALL_PATH)/lib64 
+LIB += -L$(ATLAS_LIB_PATH) -l$(ATLAS_LIBNAME)
 
 USECUBLAS   := 1
 
-PYTHON_VERSION=$(shell python -V 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1,2)
+PYTHON_VERSION=$(shell python2 -V 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1,2)
 LIB += -lpython$(PYTHON_VERSION)
 
 GENCODE_ARCH := -gencode=arch=compute_20,code=\"sm_20,compute_20\"

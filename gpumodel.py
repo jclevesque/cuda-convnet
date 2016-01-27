@@ -234,11 +234,6 @@ class IGPUModel:
             if not load_next:
                 break
             sys.stdout.flush()
-        
-        import numpy as np
-        print(test_outputs)    
-        np.savetxt('tmp/model_output', test_outputs, fmt='%i')
-        
         return self.aggregate_test_outputs(test_outputs)
     
     def set_var(self, var_name, var_val):

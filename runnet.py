@@ -246,8 +246,8 @@ class RunConvNet(ConvNet):
         label_names = self.test_data_provider.batch_meta['label_names']
 
         N = len(data[1][0])
-        preds = n.zeros((N, num_classes), dtype=n.single)
-        data += [preds]
+        probs = n.zeros((N, num_classes), dtype=n.single)
+        data += [probs]
 
         # Run the model
         self.libmodel.startFeatureWriter(data, self.sotmax_idx)
@@ -255,11 +255,17 @@ class RunConvNet(ConvNet):
 
         if self.probs_file is not None:
             import numpy as np
-            np.savetxt(self.probs_file, preds)
+            np.savetxt(self.probs_file, probs)
+
+        if self.preds_file is not None:
+            import numpy as np
+            predictions = np.argmax(probs, 1)
+            np.savetxt(self.preds_file, predictions, fmt='%i')
+
 
         # err_idx = nr.permutation(n.where(preds.argmax(axis=1) != data[1][0,:])[0])[:NUM_IMGS] # what the net got wrong
         # data[0], data[1], preds = data[0][:,err_idx], data[1][:,err_idx], preds[err_idx,:]
-        return preds
+        return probs
 
 
     def do_write_features(self):
@@ -314,7 +320,8 @@ class RunConvNet(ConvNet):
         op.add_option("channels", "channels", IntegerOptionParser, "Number of channels in layer given to --show-filters (fully-connected layers only)", default=0)
         op.add_option("show-preds", "show_preds", StringOptionParser, "Show predictions made by given softmax on test set", default="")
         op.add_option("get-test-preds", "get_test_preds", StringOptionParser, "Compute test predictions made by given softmax on test set and saves them in file", default="")
-        op.add_option("probs-file", "probs_file", StringOptionParser, "File to save computed test probabilities on.")
+        op.add_option("probs-file", "probs_file", StringOptionParser, "File to save computed test probabilities in.")
+        op.add_option("preds-file", "preds_file", StringOptionParser, "File to save computed test predictions in.")
         op.add_option("only-errors", "only_errors", BooleanOptionParser, "Show only mistaken predictions (to be used with --show-preds)", default=False, requires=['show_preds'])
         op.add_option("write-features", "write_features", StringOptionParser, "Write test data features from given layer", default="", requires=['feature-path'])
         op.add_option("feature-path", "feature_path", StringOptionParser, "Write test data features to this path (to be used with --write-features)", default="")
